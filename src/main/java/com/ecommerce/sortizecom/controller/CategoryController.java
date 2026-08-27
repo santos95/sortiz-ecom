@@ -16,7 +16,7 @@ import java.util.List;
 public class CategoryController {
 
     private CategoryService categoryService;
-    private Long nextID = 1L;
+//    private Long nextID = 1L;
 
     @Autowired
     public CategoryController(final CategoryService categoryService) {
@@ -33,7 +33,7 @@ public class CategoryController {
     @PostMapping("/admin/categories")
     public ResponseEntity<String> createCategory(@RequestBody Category category) {
 
-        category.setCategoryId(nextID++);
+//        category.setCategoryId(nextID++);
         this.categoryService.createCategory(category);
         return new ResponseEntity<>("Category added successfully", HttpStatus.CREATED);
     }
@@ -59,7 +59,7 @@ public class CategoryController {
         try {
 
             Category savedCategory = categoryService.updateCategory(categoryId, category);
-            return new ResponseEntity<>("Category with category id: " + categoryId + "updated successfully!", HttpStatus.OK);
+            return new ResponseEntity<>("Category with category id: " + categoryId + " updated successfully!", HttpStatus.OK);
 
         } catch (ResponseStatusException e) {
 
