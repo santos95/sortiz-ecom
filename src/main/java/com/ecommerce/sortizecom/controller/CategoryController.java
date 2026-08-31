@@ -2,6 +2,7 @@ package com.ecommerce.sortizecom.controller;
 
 import com.ecommerce.sortizecom.model.Category;
 import com.ecommerce.sortizecom.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +27,14 @@ public class CategoryController {
 
     @GetMapping("/public/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
+
         List<Category> categories = this.categoryService.getAllCategories();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @PostMapping("/admin/categories")
-    public ResponseEntity<String> createCategory(@RequestBody Category category) {
+    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category) {
 
-//        category.setCategoryId(nextID++);
         this.categoryService.createCategory(category);
         return new ResponseEntity<>("Category added successfully", HttpStatus.CREATED);
     }
