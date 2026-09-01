@@ -1,5 +1,6 @@
 package com.ecommerce.sortizecom.service;
 
+import com.ecommerce.sortizecom.exceptions.ResourceNotFoundException;
 import com.ecommerce.sortizecom.model.Category;
 import com.ecommerce.sortizecom.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-//    public List<Category> categories = new ArrayList<>();
     private final CategoryRepository categoryRepository;
 
     @Autowired
@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     public String deleteCategory(Long categoryID) {
 
         Category category = this.categoryRepository.findById(categoryID)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryID", categoryID));
 
         this.categoryRepository.delete(category);
 
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // check if the category exists - if not exists throw and exception
         Category savedCategory = this.categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryID", categoryId));
         category.setCategoryId(categoryId);
         savedCategory = categoryRepository.save(category);
 
