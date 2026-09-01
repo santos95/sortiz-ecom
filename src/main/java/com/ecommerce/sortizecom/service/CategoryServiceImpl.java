@@ -1,5 +1,6 @@
 package com.ecommerce.sortizecom.service;
 
+import com.ecommerce.sortizecom.exceptions.APIException;
 import com.ecommerce.sortizecom.exceptions.ResourceNotFoundException;
 import com.ecommerce.sortizecom.model.Category;
 import com.ecommerce.sortizecom.repositories.CategoryRepository;
@@ -26,13 +27,26 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void createCategory(Category category) {
 
+        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+
+        if (savedCategory != null) {
+
+            throw new APIException("Category with the name " + category.getCategoryName() + " already exists!");
+        }
+
         this.categoryRepository.save(category);
     }
 
     @Override
     public List<Category> getAllCategories() {
 
-        return this.categoryRepository.findAll();
+        List<Category> categories = this.categoryRepository.findAll();
+
+        if (categories.isEmpty()) {
+            throw new APIException("No category created till now!");
+        }
+
+        return categories;
     }
 
     @Override

@@ -34,4 +34,12 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
+
+    // bad request because try to handle cases when something wrong is passed
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<String> customAPIException(APIException e) {
+
+        String message = e.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }
