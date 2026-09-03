@@ -8,6 +8,10 @@ import com.ecommerce.sortizecom.payload.CategoryResponse;
 import com.ecommerce.sortizecom.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -48,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse getAllCategories() {
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
 //        List<CategoryDTO> categories = this.categoryRepository.findAll()
 //                .stream()
@@ -57,7 +61,14 @@ public class CategoryServiceImpl implements CategoryService {
 //                        c.getCategoryName()
 //                        ))
 //                .toList();
-        List<Category> categories = this.categoryRepository.findAll();
+
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetail = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetail);
+        List<Category> categories = categoryPage.getContent();
 
         if (categories.isEmpty()) {
             throw new APIException("No category created till now!");
@@ -67,8 +78,14 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .toList();
 
+        // set categories response object
         CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.setContet(categoryDTOS);
+        categoryResponse.setPageNumber(categoryPage.getNumber());
+        categoryResponse.setPageSize(categoryPage.getSize());
+        categoryResponse.setTotalElements(categoryPage.getTotalElements());
+        categoryResponse.setTotalPages(categoryPage.getTotalPages());
+        categoryResponse.setLastPage(categoryPage.isLast());
 
         return categoryResponse;
     }

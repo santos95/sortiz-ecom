@@ -1,5 +1,6 @@
 package com.ecommerce.sortizecom.controller;
 
+import com.ecommerce.sortizecom.config.AppConstants;
 import com.ecommerce.sortizecom.model.Category;
 import com.ecommerce.sortizecom.payload.CategoryDTO;
 import com.ecommerce.sortizecom.payload.CategoryResponse;
@@ -23,10 +24,21 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategories() {
+    @GetMapping("/echo")
+    public ResponseEntity<String> echoMessage(@RequestParam(name = "message", defaultValue = "Hello There General Kenobi!") String message){
 
-        CategoryResponse categoryResponse = this.categoryService.getAllCategories();
+        return new ResponseEntity<>("Echoed message " + message, HttpStatus.OK);
+    }
+
+    @GetMapping("/public/categories")
+    public ResponseEntity<CategoryResponse> getAllCategories(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORIES_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
+    ) {
+
+        CategoryResponse categoryResponse = this.categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
@@ -49,7 +61,6 @@ public class CategoryController {
                                                  @PathVariable Long categoryId) {
 
             CategoryDTO savedCategoryDTO= categoryService.updateCategory(categoryId, categoryDTO);
-//            return new ResponseEntity<>("Category with category id: " + savedCategory.getCategoryId() + " updated successfully!", HttpStatus.OK);
             return new ResponseEntity<>(savedCategoryDTO, HttpStatus.OK);
     }
 

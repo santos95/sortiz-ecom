@@ -1,5 +1,6 @@
 package com.ecommerce.sortizecom.exceptions;
 
+import com.ecommerce.sortizecom.payload.APIResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -29,17 +30,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> customResourceNotFoundException(ResourceNotFoundException e) {
+    public ResponseEntity<APIResponse> customResourceNotFoundException(ResourceNotFoundException e) {
 
         String message = e.getMessage();
-        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        APIResponse apiResponse = new APIResponse(message, false);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     // bad request because try to handle cases when something wrong is passed
     @ExceptionHandler(APIException.class)
-    public ResponseEntity<String> customAPIException(APIException e) {
+    public ResponseEntity<APIResponse> customAPIException(APIException e) {
 
         String message = e.getMessage();
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        APIResponse apiResponse = new APIResponse(message, false);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
 }
