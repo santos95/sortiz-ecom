@@ -1,16 +1,18 @@
 package com.ecommerce.sortizecom.service;
 
 import com.ecommerce.sortizecom.model.Category;
+import com.ecommerce.sortizecom.payload.CategoryDTO;
+import com.ecommerce.sortizecom.payload.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryService {
 
-    public List<Category> getAllCategories();
+    public CategoryResponse getAllCategories();
 
-    void createCategory(Category category);
+    CategoryDTO createCategory(CategoryDTO categoryDTO);
 
-    String deleteCategory(Long categoryID);
+    CategoryDTO deleteCategory(Long categoryID);
 
-    Category updateCategory(Long categoryId, Category category);
+    CategoryDTO updateCategory(Long categoryId, CategoryDTO categoryDTO);
 }
