@@ -9,4 +9,6 @@ public interface ProductService {
     ProductDTO addProduct(Product product, Long categoryId);
     ProductResponse getAllProducts();
     ProductResponse searchProductsByCategory(Long categoryId);
+    ProductResponse searchProductsByKeyworkd(String keyword);
+    ProductDTO updateProduct(Long productId,Product product);
 }

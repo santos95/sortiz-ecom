@@ -87,4 +87,42 @@ public class ProductServiceImpl implements ProductService {
 
         return productResponse;
     }
+
+    @Override
+    public ProductResponse searchProductsByKeyworkd(String keyword) {
+
+        List<Product> products = this.productRepository.findByProductNameLikeIgnoreCase("%" + keyword + "%");
+
+        List<ProductDTO> productDTOs = products.stream()
+                .map(product -> this.modelMapper.map(product, ProductDTO.class))
+                .toList();
+
+        ProductResponse response = new ProductResponse();
+        response.setContent(productDTOs);
+
+        return response;
+    }
+
+    @Override
+    public ProductDTO updateProduct(Long productId, Product product) {
+
+        // get product from db
+        Product savedProduct = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        // update product informacion with the one in the request body
+        savedProduct.setProductName(product.getProductName());
+        savedProduct.setDescription(product.getDescription());
+        savedProduct.setQuantity(product.getQuantity());
+        savedProduct.setPrice(product.getPrice());
+        savedProduct.setDiscount(product.getDiscount());
+        // set the special price - after discount
+        double specialPrice = product.getPrice() - (product.getDiscount() * 0.01 * product.getPrice());
+        savedProduct.setSpecialPrice(specialPrice);
+
+
+        savedProduct = this.productRepository.save(product);
+
+        return this.modelMapper.map(savedProduct, ProductDTO.class);
+    }
 }
