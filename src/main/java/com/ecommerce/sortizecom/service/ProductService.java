@@ -6,9 +6,10 @@ import com.ecommerce.sortizecom.payload.ProductResponse;
 
 public interface ProductService {
 
-    ProductDTO addProduct(Product product, Long categoryId);
+    ProductDTO addProduct(ProductDTO productDTO, Long categoryId);
     ProductResponse getAllProducts();
     ProductResponse searchProductsByCategory(Long categoryId);
     ProductResponse searchProductsByKeyworkd(String keyword);
-    ProductDTO updateProduct(Long productId,Product product);
+    ProductDTO updateProduct(Long productId, ProductDTO productDTO);
+    ProductDTO deleteProduct(Long productId);
 }

@@ -4,6 +4,7 @@ import com.ecommerce.sortizecom.model.Product;
 import com.ecommerce.sortizecom.payload.ProductDTO;
 import com.ecommerce.sortizecom.payload.ProductResponse;
 import com.ecommerce.sortizecom.service.ProductService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,12 @@ public class ProductController {
 
     @PostMapping("/admin/categories/{categoryId}/product")
     public ResponseEntity<ProductDTO> addProduct(
-            @RequestBody Product product,
+            @RequestBody ProductDTO productDTO,
             @PathVariable Long categoryId) {
 
-        ProductDTO productDTO = this.productService.addProduct(product, categoryId);
+        ProductDTO savedProduct = this.productService.addProduct(productDTO, categoryId);
 
-        return new ResponseEntity<>(productDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
     @GetMapping("/public/products")
@@ -39,9 +40,9 @@ public class ProductController {
     }
 
     @GetMapping("/public/categories/{categorgyId}/products")
-    public ResponseEntity<ProductResponse> getProductsByCategory(@PathVariable Long categorgyId){
+    public ResponseEntity<ProductResponse> getProductsByCategory(@PathVariable Long categoryId){
 
-        ProductResponse productResponse = this.productService.searchProductsByCategory(categorgyId);
+        ProductResponse productResponse = this.productService.searchProductsByCategory(categoryId);
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
@@ -55,9 +56,21 @@ public class ProductController {
     }
 
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody Product product, @PathVariable Long productId) {
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
 
-        ProductDTO updatedProductDTO = this.productService.updateProduct(productId, product);
+        ProductDTO updatedProductDTO = this.productService.updateProduct(productId, productDTO);
         return new ResponseEntity<>(updatedProductDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/products/{productId}/image")
+    public ResponseEntity<ProductDTO> updateProductImage()
+
+    @DeleteMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
+
+        ProductDTO productDTO = this.productService.deleteProduct(productId);
+
+        return new ResponseEntity<>(productDTO, HttpStatus.OK);
+
     }
 }

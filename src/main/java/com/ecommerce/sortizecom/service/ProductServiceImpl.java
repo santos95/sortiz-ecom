@@ -32,11 +32,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO addProduct(Product product, Long categoryId) {
+    public ProductDTO addProduct(ProductDTO productDTO, Long categoryId) {
 
         // get category of the product
         Category category = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
+
+        // convert the dto into a product entity class
+        Product product = this.modelMapper.map(productDTO, Product.class);
 
         product.setCategory(category);
 
@@ -104,11 +107,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO updateProduct(Long productId, Product product) {
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
 
         // get product from db
         Product savedProduct = this.productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        Product product = this.modelMapper.map(productDTO, Product.class);
 
         // update product informacion with the one in the request body
         savedProduct.setProductName(product.getProductName());
@@ -124,5 +129,16 @@ public class ProductServiceImpl implements ProductService {
         savedProduct = this.productRepository.save(product);
 
         return this.modelMapper.map(savedProduct, ProductDTO.class);
+    }
+
+    @Override
+    public ProductDTO deleteProduct(Long productId) {
+
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        this.productRepository.delete(product);
+
+        return this.modelMapper.map(product, ProductDTO.class);
     }
 }
