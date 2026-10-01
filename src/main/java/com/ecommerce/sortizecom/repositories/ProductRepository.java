@@ -14,4 +14,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryOrderByPriceAsc(Category category);
     // find all products filtering by field product name, using patter matchin (like) and ignoring cases
     List<Product> findByProductNameLikeIgnoreCase(String keyword);
+    Product findByProductName(String productName);
 }

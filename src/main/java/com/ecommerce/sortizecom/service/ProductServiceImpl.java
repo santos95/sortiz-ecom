@@ -1,5 +1,6 @@
 package com.ecommerce.sortizecom.service;
 
+import com.ecommerce.sortizecom.exceptions.APIException;
 import com.ecommerce.sortizecom.exceptions.ResourceNotFoundException;
 import com.ecommerce.sortizecom.model.Category;
 import com.ecommerce.sortizecom.model.Product;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -52,6 +54,14 @@ public class ProductServiceImpl implements ProductService {
         Category category = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
+        // check if product exists
+        Product existingProduct = this.productRepository.findByProductName(productDTO.getProductName());
+
+        if (Objects.isNull(existingProduct)) {
+
+            throw new APIException("Product with the name " + productDTO.getProductName() + " already exists!");
+        }
+
         // convert the dto into a product entity class
         Product product = this.modelMapper.map(productDTO, Product.class);
 
@@ -76,6 +86,11 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products = this.productRepository.findAll();
 
+        if (products.isEmpty()) {
+
+            throw new APIException("No product created till now!");
+        }
+
         List<ProductDTO> productsDTOs = products.stream()
                 .map(product -> this.modelMapper.map(product, ProductDTO.class))
                 .toList();
@@ -95,6 +110,12 @@ public class ProductServiceImpl implements ProductService {
 
         // get all products by the category
         List<Product> products = this.productRepository.findByCategoryOrderByPriceAsc(category);
+
+        if (products.isEmpty()) {
+
+            throw new APIException("No product created for the category till now!");
+        }
+
         List<ProductDTO> productDTOs = products.stream()
                 .map(product -> this.modelMapper.map(product, ProductDTO.class))
                 .toList();
@@ -109,6 +130,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse searchProductsByKeyworkd(String keyword) {
 
         List<Product> products = this.productRepository.findByProductNameLikeIgnoreCase("%" + keyword + "%");
+
+        if (products.isEmpty()) {
+
+            throw new APIException("No product was found with the keyword!");
+        }
 
         List<ProductDTO> productDTOs = products.stream()
                 .map(product -> this.modelMapper.map(product, ProductDTO.class))

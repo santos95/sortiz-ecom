@@ -54,14 +54,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-//        List<CategoryDTO> categories = this.categoryRepository.findAll()
-//                .stream()
-//                .map(c -> new CategoryDTO(
-//                        c.getCategoryId(),
-//                        c.getCategoryName()
-//                        ))
-//                .toList();
-
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();

@@ -4,6 +4,7 @@ import com.ecommerce.sortizecom.model.Product;
 import com.ecommerce.sortizecom.payload.ProductDTO;
 import com.ecommerce.sortizecom.payload.ProductResponse;
 import com.ecommerce.sortizecom.service.ProductService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class ProductController {
 
     @PostMapping("/admin/categories/{categoryId}/product")
     public ResponseEntity<ProductDTO> addProduct(
-            @RequestBody ProductDTO productDTO,
+            @Valid @RequestBody ProductDTO productDTO,
             @PathVariable Long categoryId) {
 
         ProductDTO savedProduct = this.productService.addProduct(productDTO, categoryId);
@@ -59,7 +60,8 @@ public class ProductController {
     }
 
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO, @PathVariable Long productId) {
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO,
+                                                    @PathVariable Long productId) {
 
         ProductDTO updatedProductDTO = this.productService.updateProduct(productId, productDTO);
         return new ResponseEntity<>(updatedProductDTO, HttpStatus.OK);
