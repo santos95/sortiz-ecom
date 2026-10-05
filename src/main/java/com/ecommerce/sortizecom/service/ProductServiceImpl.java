@@ -54,31 +54,45 @@ public class ProductServiceImpl implements ProductService {
         Category category = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
-        // check if product exists
-        Product existingProduct = this.productRepository.findByProductName(productDTO.getProductName());
+        boolean isProductNotPresent = true;
 
-        if (Objects.isNull(existingProduct)) {
+        // get list of products from category
+        List<Product> products = category.getProducts();
 
-            throw new APIException("Product with the name " + productDTO.getProductName() + " already exists!");
+        // loop over the products list and check if exists
+        for (Product product : products) {
+            // if products is in the list, change the flag to false and breaks the loop
+            if (product.getProductName().equals(productDTO.getProductName())) {
+
+                isProductNotPresent = false;
+                break;
+            }
         }
 
-        // convert the dto into a product entity class
-        Product product = this.modelMapper.map(productDTO, Product.class);
+        if (isProductNotPresent) {
 
-        product.setCategory(category);
+            // convert the dto into a product entity class
+            Product product = this.modelMapper.map(productDTO, Product.class);
 
-        // set the special price - after discount
-        double specialPrice = product.getPrice() - (product.getDiscount() * 0.01 * product.getPrice());
-        product.setSpecialPrice(specialPrice);
+            product.setCategory(category);
 
-        // save the image
-        product.setImage("default.png");
+            // set the special price - after discount
+            double specialPrice = product.getPrice() - (product.getDiscount() * 0.01 * product.getPrice());
+            product.setSpecialPrice(specialPrice);
 
-        // save product
-        Product savedProduct = this.productRepository.save(product);
+            // save the image
+            product.setImage("default.png");
 
-        // conver to dto and return
-        return this.modelMapper.map(savedProduct, ProductDTO.class);
+            // save product
+            Product savedProduct = this.productRepository.save(product);
+
+            // conver to dto and return
+            return this.modelMapper.map(savedProduct, ProductDTO.class);
+
+        } else {
+
+            throw new APIException("Product already exists!");
+        }
     }
 
     @Override
@@ -86,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products = this.productRepository.findAll();
 
+        // check if the list has zero products
         if (products.isEmpty()) {
 
             throw new APIException("No product created till now!");
