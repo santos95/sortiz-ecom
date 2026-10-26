@@ -177,6 +177,41 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductResponse searchProductsByCategory(long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+        // get the category
+        Category category = this.categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "categoryId", categoryId));
+
+        // define the pagination requirements
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetail = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Product> productPage = this.productRepository.findByCategoryOrderByPriceAsc(category, pageDetail);
+
+        if (productPage.isEmpty()) {
+            throw new APIException("No product created for the category till now!");
+        }
+
+        List<ProductDTO> productDTOS = productPage.stream()
+                .map(product -> this.modelMapper.map(product, ProductDTO.class))
+                .toList();
+
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDTOS);
+        productResponse.setPageNumber(productPage.getNumber());
+        productResponse.setPageSize(productPage.getSize());
+        productResponse.setTotalElements(productPage.getTotalElements());
+        productResponse.setTotalPages(productPage.getTotalPages());
+        productResponse.setLastPage(productPage.isLast());
+
+        return productResponse;
+    }
+
+    @Override
     public ProductResponse searchProductsByKeyworkd(String keyword) {
 
         List<Product> products = this.productRepository.findByProductNameLikeIgnoreCase("%" + keyword + "%");
