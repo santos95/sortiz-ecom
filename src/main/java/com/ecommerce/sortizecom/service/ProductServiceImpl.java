@@ -18,13 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -212,9 +207,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse searchProductsByKeyworkd(String keyword) {
+    public ProductResponse searchProductsByKeyworkd(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-        List<Product> products = this.productRepository.findByProductNameLikeIgnoreCase("%" + keyword + "%");
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetail = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Product> productPage = this.productRepository.findByProductNameLikeIgnoreCase("%" + keyword + "%", pageDetail);
+        List<Product> products = productPage.getContent();
 
         if (products.isEmpty()) {
 
@@ -227,6 +228,11 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse response = new ProductResponse();
         response.setContent(productDTOs);
+        response.setPageNumber(productPage.getNumber());
+        response.setPageSize(productPage.getSize());
+        response.setTotalElements(productPage.getTotalElements());
+        response.setTotalPages(productPage.getTotalPages());
+        response.setLastPage(productPage.isLast());
 
         return response;
     }

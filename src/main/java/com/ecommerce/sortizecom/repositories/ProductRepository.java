@@ -16,5 +16,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCategoryOrderByPriceAsc(Category category, Pageable pageable);
     // find all products filtering by field product name, using patter matchin (like) and ignoring cases
     List<Product> findByProductNameLikeIgnoreCase(String keyword);
+    Page<Product> findByProductNameLikeIgnoreCase(String keyword, Pageable pageable);
     Product findByProductName(String productName);
 }

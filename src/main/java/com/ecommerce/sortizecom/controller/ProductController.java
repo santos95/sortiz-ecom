@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,11 +20,13 @@ import java.io.IOException;
 @RequestMapping("/api")
 public class ProductController {
 
+    private final RequestAttributes requestAttributes;
     private ProductService productService;
 
     @Autowired
-    public ProductController(final ProductService productService) {
+    public ProductController(final ProductService productService, RequestAttributes requestAttributes) {
         this.productService = productService;
+        this.requestAttributes = requestAttributes;
     }
 
     @PostMapping("/admin/categories/{categoryId}/product")
@@ -63,9 +66,14 @@ public class ProductController {
     }
 
     @GetMapping("/public/products/keyword/{keyword}")
-    public ResponseEntity<ProductResponse> getProductsByKeyword(@PathVariable String keyword) {
+    public ResponseEntity<ProductResponse> getProductsByKeyword(
+            @PathVariable String keyword,
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue =  AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_PRODUCTS_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
 
-        ProductResponse productResponse = this.productService.searchProductsByKeyworkd(keyword);
+        ProductResponse productResponse = this.productService.searchProductsByKeyworkd(keyword, pageNumber, pageSize, sortBy, sortOrder);
 
         return new ResponseEntity<>(productResponse, HttpStatus.FOUND);
     }
